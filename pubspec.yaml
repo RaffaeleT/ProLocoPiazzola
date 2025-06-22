@@ -1,0 +1,16 @@
+name: proloco_piazzola
+description: App Flutter per la gestione degli espositori di ProLoco Piazzola
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  path_provider: ^2.1.2
+  file_picker: ^10.2.0
+  csv: ^6.0.0
+  flutter_hooks: ^0.21.2
+flutter:
+  uses-material-design: true
