@@ -124,6 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           onSelectChanged: (_) {
                             final controller = TextEditingController(
                                 text: editableRow[2].toString());
+                            final focusNode = FocusNode();
                             bool currentChecked = editableRow.length > 3 &&
                                 editableRow[3].toString().toLowerCase() ==
                                     'true';
@@ -132,6 +133,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               context: context,
                               builder: (context) => StatefulBuilder(
                                 builder: (context, setStateDialog) {
+                                  // Request focus after the dialog is built
+                                  WidgetsBinding.instance
+                                      .addPostFrameCallback((_) {
+                                    focusNode.requestFocus();
+                                  });
+
                                   return AlertDialog(
                                     title: Text("Modifica ${editableRow[0]}"),
                                     content: Column(
@@ -145,6 +152,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         const SizedBox(height: 12),
                                         TextField(
                                           controller: controller,
+                                          focusNode:
+                                              focusNode, // Attach the focus node here
                                           decoration: const InputDecoration(
                                               labelText: "Espositore 2"),
                                         ),
@@ -190,8 +199,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                             }
                                             _rows[index] = editableRow;
                                           });
-                                          _saveAndExport().then(
-                                              (_) => Navigator.pop(context));
+                                          Navigator.pop(context);
+                                          _saveAndExport();
                                         },
                                         child: const Text("Salva"),
                                       ),

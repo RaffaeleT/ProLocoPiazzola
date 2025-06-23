@@ -14,7 +14,11 @@ class MyApp extends StatelessWidget {
       title: 'ProLoco Piazzola',
       theme: ThemeData(
         useMaterial3: true,
-        colorSchemeSeed: Colors.blue,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+        ),
       ),
       home: const HomeScreen(),
     );
