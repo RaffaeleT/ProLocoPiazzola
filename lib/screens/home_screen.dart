@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:csv/csv.dart';
+import 'package:flutter/services.dart'; // Import for HapticFeedback
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -98,6 +99,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 _saveAndExport();
               },
             ),
+            const Divider(),
+            // Add a spacer and the exit option at the bottom
+            SizedBox(height: 300), // Adjust height as needed for your layout
+            ListTile(
+              leading: const Icon(Icons.exit_to_app),
+              title: const Text("Esci"),
+              onTap: () {
+                Navigator.pop(context);
+                // Exit the app
+                Future.delayed(const Duration(milliseconds: 200), () {
+                  // Use SystemNavigator.pop() for Android, exit(0) for both platforms
+                  // Import 'dart:io' at the top if not already present
+                  exit(0);
+                });
+              },
+            ),
           ],
         ),
       ),
@@ -110,9 +127,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     scrollDirection: Axis.horizontal,
                     child: DataTable(
                       showCheckboxColumn: false,
-                      columns: _rows.first
-                          .map((e) => DataColumn(label: Text(e.toString())))
-                          .toList(),
+                      // columns: _rows.first
+                      //     .map((e) => DataColumn(label: Text(e.toString())))
+                      //     .toList(),
+                      columns: const [
+                        DataColumn(label: Text("Stallo")),
+                        DataColumn(label: Text("Espositore 1")),
+                        DataColumn(label: Text("Espositore 2")),
+                        DataColumn(label: Text("Verificato")),
+                      ],
                       rows: _rows.skip(1).map((row) {
                         final index = _rows.indexOf(row);
                         final editableRow = List.from(row);
@@ -121,7 +144,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           cells: editableRow
                               .map((e) => DataCell(Text(e.toString())))
                               .toList(),
-                          onSelectChanged: (_) {
+                          onSelectChanged: (_) async {
+                            // Vibrate on tap
+                            await HapticFeedback.vibrate();
+
                             final controller = TextEditingController(
                                 text: editableRow[2].toString());
                             final focusNode = FocusNode();
@@ -140,49 +166,56 @@ class _HomeScreenState extends State<HomeScreen> {
                                   });
 
                                   return AlertDialog(
-                                    title: Text("Modifica ${editableRow[0]}"),
-                                    content: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text("Booth: ${editableRow[0]}"),
-                                        const SizedBox(height: 8),
-                                        Text("Espositore 1: ${editableRow[1]}"),
-                                        const SizedBox(height: 12),
-                                        TextField(
-                                          controller: controller,
-                                          focusNode:
-                                              focusNode, // Attach the focus node here
-                                          decoration: const InputDecoration(
-                                              labelText: "Espositore 2"),
-                                        ),
-                                        const SizedBox(height: 12),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                    title: Text(
+                                        "Gestione stallo ${editableRow[0]}"),
+                                    content: SizedBox(
+                                        width: MediaQuery.of(context)
+                                                .size
+                                                .width *
+                                            0.8, // Set width to 80% of screen width
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            const Text("Checked"),
-                                            GestureDetector(
-                                              onTap: () {
-                                                setStateDialog(() {
-                                                  currentChecked =
-                                                      !currentChecked;
-                                                });
-                                              },
-                                              child: Switch(
-                                                value: currentChecked,
-                                                onChanged: (value) {
-                                                  setStateDialog(() {
-                                                    currentChecked = value;
-                                                  });
-                                                },
-                                              ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                                "Espositore 1: ${editableRow[1]}"),
+                                            const SizedBox(height: 12),
+                                            TextField(
+                                              controller: controller,
+                                              focusNode:
+                                                  focusNode, // Attach the focus node here
+                                              decoration: const InputDecoration(
+                                                  labelText: "Espositore 2"),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment
+                                                  .start, // Align to start (left)
+                                              children: [
+                                                const Text("Verificato"),
+                                                const SizedBox(width: 12),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    setStateDialog(() {
+                                                      currentChecked =
+                                                          !currentChecked;
+                                                    });
+                                                  },
+                                                  child: Switch(
+                                                    value: currentChecked,
+                                                    onChanged: (value) {
+                                                      setStateDialog(() {
+                                                        currentChecked = value;
+                                                      });
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
-                                        ),
-                                      ],
-                                    ),
+                                        )),
                                     actions: [
                                       TextButton(
                                         onPressed: () => Navigator.pop(context),
